@@ -1,78 +1,254 @@
-JavaScript Rock Dodger
----
+/**
+ * Don't change these constants!
+ */
 
-## Objectives
+const DODGER = document.getElementById('dodger')
+const GAME = document.getElementById('game')
+const GAME_HEIGHT = 400
+const GAME_WIDTH = 400
+const LEFT_ARROW = 37 // use e.which!
+const RIGHT_ARROW = 39 // use e.which!
+const ROCKS = []
+const START = document.getElementById('start')
 
-1. Use JavaScript to build a rock-dodging game
-2. Explain how `window.requestAnimationFrame()` is used to animate movement on a page
-3. Explain how to use `setInterval()`
-4. Show off your JavaScript know-how
+var gameInterval = null
 
-## Instructions
+/**
+ * Be aware of what's above this line,
+ * but all of your work should happen below.
+ */
 
-You did it — you've made it to the end of the introductory JavaScript curriculum. You've learned how to write JavaScript and how to use JavaScript to manipulate the DOM. Now, only this lab stands between you and ~~freedom~~ the end of this course!
+function checkCollision(rock) {
+  // implement me!
+  // use the comments below to guide you!
+  const top = positionToInteger(rock.style.top)
 
-So that we don't catch you off-guard, know that this project is meant to be difficult. We're really testing the limits of what we've learned so far. But know that we've solved the lab using only things that we've taught — well, mostly. There are two things (which we've partially implemented for you) that you should know about.
+  // rocks are 20px high
+  // DODGER is 20px high
+  // GAME_HEIGHT - 20 - 20 = 360px;
+  if (top > 360) {
+    const dodgerLeftEdge = positionToInteger(DODGER.style.left)
 
-### `window.requestAnimationFrame()`
+    // FIXME: The DODGER is 40 pixels wide -- how do we get the right edge?
+    
+    const dodgerRightEdge = dodgerLeftEdge + 40;
 
-This function tells the browser that we want to animate some change on the page. We'll use it in this lab for animating the movement of rocks and the dodger.
 
-We can use [`window.requestAnimationFrame()`](https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame) by passing it a callback that contains our animation:
+    const rockLeftEdge = positionToInteger(rock.style.left);
 
-``` javascript
-function move(el) {
+
+    // FIXME: The rock is 20 pixel's wide -- how do we get the right edge?
+    
+    const rockRightEdge = rockLeftEdge + 20;
+
+
+    if ((rockLeftEdge < dodgerLeftEdge && rockRightEdge > dodgerLeftEdge)
+          || (rockLeftEdge > dodgerLeftEdge && rockRightEdge < dodgerRightEdge) 
+          || (rockLeftEdge < dodgerRightEdge && rockRightEdge > dodgerRightEdge))  
+          
+          /**
+               * Think about it -- what's happening here?
+               * There's been a collision if one of three things is true:
+               * 1. The rock's left edge is < the DODGER's left edge,
+               *    and the rock's right edge is > the DODGER's left edge;
+               * 2. The rock's left edge is > the DODGER's left edge,
+               *    and the rock's right edge is < the DODGER's right edge;
+               * 3. The rock's left edge is < the DODGER's right edge,
+               *    and the rock's right edge is > the DODGER's right edge
+               */ 
+               
+               {
+      return true
+    
+  } 
+ }
+}
+
+function createRock(x) {
+  const rock = document.createElement('div')
+
+  rock.className = 'rock'
+  rock.style.left = `${x}px`
+
+  // Hmmm, why would we have used `var` here?
   var top = 0
 
-  function step() {
-    el.style.top = `${top += 2}px`
+  rock.style.top = top
 
-    if (top < 200) {
-      window.requestAnimationFrame(step)
-    }
+  /**
+   * Now that we have a rock, we'll need to append
+   * it to GAME and move it downwards.
+   */
+
+  GAME.appendChild(rock)
+
+
+  /**
+   * This function moves the rock. (2 pixels at a time
+   * seems like a good pace.)
+   */
+
+  function moveRock() {
+    // implement me!
+    // (use the comments below to guide you!)
+    /**
+     * If a rock collides with the DODGER,
+     * we should call endGame()
+     */
+    
+    
+
+    function move() {
+      
+      rock.style.top = `${top += 2}px`
+      if (top < GAME_HEIGHT) {
+        window.requestAnimationFrame(move)
+        if (checkCollision(rock) === true) {
+          endGame()
+        } 
+          
+        
+        
+      } else if (top >= GAME_HEIGHT) {
+        rock.remove()
+        
+      } 
+    
+    
+    } 
+  
+   window.requestAnimationFrame(move)
+
+    
+    /**
+     * Otherwise, if the rock hasn't reached the bottom of
+     * the GAME, we want to move it again.
+     */
+
+    /**
+     * But if the rock *has* reached the bottom of the GAME,
+     * we should remove the rock from the DOM
+     */
   }
 
-  window.requestAnimationFrame(step)
-}
-```
 
-If we call `move(el)` with a valid DOM element, `window.requestAnimationFrame()` will be called with the function `step`, which moves the `el` down the page in two-pixel increments until it's been moved 200 pixels. Pretty easy, right?
+  // We should kick of the animation of the rock around here
+  moveRock()
+  // Add the rock to ROCKS so that we can remove all rocks
+  // when there's a collision
+  ROCKS.push(rock)
+  
 
-(Note that we can pass `step` to `window.requestAnimationFrame()` _inside_ of `step`. This is a nifty feature of JavaScript (and other languages) called [_recursion_](https://en.wikipedia.org/wiki/Recursion_(computer_science)). Don't worry if this concept makes your head spin a bit — that feeling is normal. For now, know that we can use `window.requestAnimationFrame()` as demonstrated above.)
-
-### `setInterval()`
-
-[`setInterval()`](https://developer.mozilla.org/en-US/docs/Web/API/WindowTimers/setInterval) takes two arguments: a callback, and an interval in milliseconds. We can use it like so:
-
-``` javascript
-function sayHello() {
-  console.log('hello')
+  // Finally, return the rock element you've created
+  return rock
 }
 
-const myInterval = setInterval(sayHello, 1000)
-```
+/**
+ * End the game by clearing `gameInterval`,
+ * removing all ROCKS from the DOM,
+ * and removing the `moveDodger` event listener.
+ * Finally, alert "YOU LOSE!" to the player.
+ */
 
-The above will print `'hello'` to console once every second.
+function endGame() {
+  clearInterval(gameInterval)
+  
+  ROCKS.splice(0, ROCKS.length)
+  document.removeEventListener("keydown", moveDodger);
+  alert("YOU LOSE!")
+}
 
-Note that `setInterval()` returns a reference to the interval. We can stop the interval from executing by calling `clearInterval(myInterval)`.
+function moveDodger(e) {
+  // implement me!
+  /**
+   * This function should call `moveDodgerLeft()`
+   * if the left arrow is pressed and `moveDodgerRight()`
+   * if the right arrow is pressed. (Check the constants
+   * we've declared for you above.)
+   * And be sure to use the functions declared below!
+   */
 
-### Getting Started
+  document.addEventListener('keydown', function(e) {
+    if (e.which === LEFT_ARROW) {
+      moveDodgerLeft()
+      e.preventDefault()
+      
+    } else if (e.which === RIGHT_ARROW) {
+      moveDodgerRight()
+      
+      e.preventDefault()
+    
+    } else {
+      e.preventDefault()
+    }
+  })
 
-Open up `index.html` in your browser. You should see a black 400-by-400px box with a white square at the bottom. That square is the dodger — it can only move left and right.
+}
 
-Well, it _should_ be able to move only left and right — we'll need to implement that functionality!
+function moveDodgerLeft() {
+  // implement me!
+  /**
+   * This function should move DODGER to the left
+   * (mabye 4 pixels?). Use window.requestAnimationFrame()!
+   */
 
-Now open `index.js`. You'll see that we've defined a few functions for you, but we've left much of the file blank.
+      const left = positionToInteger(DODGER.style.left) 
+  
+      
+      function step() {
+        if (left > 0) {
+          var step = DODGER.style.left = `${left - 4}px`
+        }
+        if (step > 0 && step > left) {
+          window.requestAnimationFrame(step)
+      }
+    }
+      
+   window.requestAnimationFrame(step)
+  
+    
+  }
 
-We've left enough comments to get you started, though, and we've defined all of the HTML and CSS that you'll need so that you can just focus on the JavaScript!
+function moveDodgerRight() {
+  // implement me!
+  /**
+   * This function should move DODGER to the right
+   * (mabye 4 pixels?). Use window.requestAnimationFrame()!
+   */
 
-Remember to reload the page after updating and saving the file. You've got this!
+  const left = positionToInteger(DODGER.style.left) 
+  
+      
+      function step() {
+        if (left < (GAME_WIDTH - 40)) {
+          var step = DODGER.style.left = `${left + 4}px`
+        }
+        if (step < (GAME_WIDTH - 40) && step > left) {
+          window.requestAnimationFrame(step)
+      }
+    }
+      
+   window.requestAnimationFrame(step)
 
-Good luck!
+  
+}
 
-## Resources
 
-- [window.requestAnimationFrame()](https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame)
-- [setInterval()](https://developer.mozilla.org/en-US/docs/Web/API/WindowTimers/setInterval)
+/**
+ * @param {string} p The position property
+ * @returns {number} The position as an integer (without 'px')
+ */
 
-<p class='util--hide'>View <a href='https://learn.co/lessons/javascript-rock-dodger'>Rock Dodger</a> on Learn.co and start learning to code for free.</p>
+function positionToInteger(p) {
+  return parseInt(p.split('px')[0]) || 0
+}
+
+function start() {
+  window.addEventListener('keydown', moveDodger)
+
+  START.style.display = 'none'
+
+  gameInterval = setInterval(function() {
+    createRock(Math.floor(Math.random() *  (GAME_WIDTH - 20)))
+  }, 1000)
+}

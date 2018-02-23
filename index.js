@@ -50,7 +50,9 @@ function checkCollision(rock) {
                */ {
       return true
     
-  } 
+  } else {
+    return false
+  }
  }
 }
 
@@ -139,10 +141,12 @@ function createRock(x) {
  */
 function endGame() {
   clearInterval(gameInterval)
-  
+  ROCKS.forEach(function(rock){rock.remove()})
   ROCKS.splice(0, ROCKS.length)
   document.removeEventListener("keydown", moveDodger);
+  
   alert("YOU LOSE!")
+  
 }
 
 function moveDodger(e) {
@@ -154,16 +158,19 @@ function moveDodger(e) {
    * we've declared for you above.)
    * And be sure to use the functions declared below!
    */
-  document.addEventListener('keydown', function(e) {
+  
     if (e.which === LEFT_ARROW) {
       moveDodgerLeft()
+
       
       
     } else if (e.which === RIGHT_ARROW) {
       moveDodgerRight()
       
+    } else {
+      e.preventDefault()
     }
-  })
+  
 
 }
 
@@ -173,21 +180,16 @@ function moveDodgerLeft() {
    * This function should move DODGER to the left
    * (mabye 4 pixels?). Use window.requestAnimationFrame()!
    */
-      const left = positionToInteger(DODGER.style.left) 
-  
-      
-      function step() {
+   
+      window.requestAnimationFrame(function() {
+        
+        const left = positionToInteger(DODGER.style.left)
+        
         if (left > 0) {
-          var step = DODGER.style.left = `${left - 4}px`
+          DODGER.style.left = `${left - 4}px`
         }
-        if (step > 0 && step > left) {
-          window.requestAnimationFrame(step)
-      }
-    }
+      })
       
-   window.requestAnimationFrame(step)
-  
-    
   }
 
 function moveDodgerRight() {
@@ -196,19 +198,16 @@ function moveDodgerRight() {
    * This function should move DODGER to the right
    * (mabye 4 pixels?). Use window.requestAnimationFrame()!
    */
-  const left = positionToInteger(DODGER.style.left) 
+   window.requestAnimationFrame(function() {
+     const left = positionToInteger(DODGER.style.left)
+     
+     if (left < (GAME_WIDTH - 40)) {
+       DODGER.style.left = `${left + 4}px`
+     }
+     
+   })
+   
   
-      
-      function step() {
-        if (left < (GAME_WIDTH - 40)) {
-          var step = DODGER.style.left = `${left + 4}px`
-        }
-        if (step < (GAME_WIDTH - 40) && step > left) {
-          window.requestAnimationFrame(step)
-      }
-    }
-      
-   window.requestAnimationFrame(step)
 
   
 }
