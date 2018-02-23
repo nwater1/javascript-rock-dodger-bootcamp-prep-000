@@ -219,20 +219,7 @@ function moveDodgerRight() {
       }
       
     })
-  const left = positionToInteger(DODGER.style.left) 
   
-      
-      function step() {
-        if (left < (GAME_WIDTH - 40)) {
-          var step = DODGER.style.left = `${left + 4}px`
-        }
-        if (step < (GAME_WIDTH - 40) && step > left) {
-          window.requestAnimationFrame(step)
-      }
-    }
-      
-   window.requestAnimationFrame(step)
-
   
 }
 
