@@ -170,10 +170,7 @@ function moveDodger(e) {
       e.preventDefault()
       e.stopPropagation()
       
-    } else {
-      e.preventDefault()
-      e.stopPropagation()
-    }
+    } 
   
 
 }
